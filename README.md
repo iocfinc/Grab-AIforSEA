@@ -69,15 +69,37 @@ Below are some of the results I got from the model training. The individual mode
 
 <p align='center'><img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/AIFORSEA-LSTM_WITH_TRAIN_PLOT.png" alt="AIFORSEA-LSTM_WITH_TRAIN_PLOT"></p>
 
+For the LSTM Model, the idea that I have a lookback window of 25 sequences and a forecast window of 5. The results on the encoded model were quite good. In terms of "fit" it seems to look a lot like the actual values. As expected, really high spikes tend to not get represented well. Also, the 25 sequence length could be restrictive. More exploration can be done on this for future improvements.
+
 ## SARIMA Model
 
 <p align='center'><img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/SARIMA-MODEL-5800 Predictions.png" alt="SARIMA-MODEL-5800 Predictions Plot"></p>
+
+The output of the SARIMA model is seen above. Again, it does seem to model the encoded data well. The final paramters used for the SARIMA was a PDQ(0,0,0) and a Seasonal pdq(1,0,0) with the trend set to constant. These parameters were arrived at with the help of the Autocorr plot below, the ACF and PACF and a grid search of possible combinations of PDQ, pdq and trend which was already covered in [Machine Learning Mastery](https://machinelearningmastery.com/how-to-grid-search-sarima-model-hyperparameters-for-time-series-forecasting-in-python/). Using the likely values we can see in the plots below we get a SARIMAX [(0, 0, 0), (1, 0, 0, 0), 'c'] with an RMSE of 0.004634905424127102. Not really bad for a simple SARIMAX model. Also, you would notice on the EvaluationNotebook that there is no loaded model for SARIMAX. SARIMAX continously updates its fit per iteration. You can think of it as a dynamic model where the updates happen at the time of the prediction instead of being trained beforehand.
+
+<p align='center'><img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/AIFORSEA-AUTOCORR_PLOT.png" alt="AIFORSEA-AUTOCORR_PLOT"></p>
+
+<p align='center'><img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/AIFORSEA-PACF_PLOT.png" alt="AIFORSEA-PACF_PLOT"></p>
 
 ## Ensemble Random Forest Regression
 
 <p align='center'><img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/AIFORSEA-DECODED_SCORE_PLOT_LONG.png" alt="AIFORSEA-DECODED_SCORE_PLOT_LONG"></p>
 
 For the ensemble model predictions, I do not have the plot of the fit of the actual and predicted values. Instead, I have a plot of the decoded RMS values every prediction step of the ensemble model. It shows that there is still room for improvement for the model. We notice that the errors tend to be magnified more during times where there is activity and die down when there is low demand overall. I am thinking this could be thought of as the effects of residuals. In any, case there is still room for improvement for future implementations.
+
+Below are the importance of the individual features as inputs to the Random Forest Regressor. LSTM privded majority of the weights towards the final predictions. We see that we can still improve the Features provided to the Regressor. Maybe we take a look at other possible sources of features. These regressors are simply derived from the LSTM and SARIMA model. It is noticable how small SARIMA contributes to the final predictions.
+
+<p align='center'>
+| Feature | Weight |
+| :---: | ---|
+| SARIMA | 0.05922411386898257 |
+| LSTM | 0.29922722858556994 |
+| SARIMA_UP | 0.05565608540644605 |
+| SARIMA_LOW | 0.0723716966207925 |
+| LSTM_UP | 0.2773486113129659 |
+| LSTM_LOW | 0.23378996199788474 |
+| POS | 0.0023823022073583993 |
+</p>
 
 ## Spatial Analysis 🗺
 
@@ -149,13 +171,13 @@ Now we combine both the **when** and the **where** data. In **Temporal** we get 
 
 ## Animated Heatmap
 
-<!-- <p align='center'>
+<p align='center'>
 <img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/HEATMAP-DAY7-10_giphy.gif" alt="Heatmap day 7-10 gif">
 
 <b><a href='https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/' alt='HEATMAP ANIMATION VIDEOS'></a></b>
 <br>
 
-</p> -->
+</p>
 
 Making these animated heatmaps should reinforce what we have been noticing in the spatial and temporal. For example, we will notice that the heatmap _blooms_ during times where we have high demand indicated in the observed data. Translating this into the heatmap allows us to see where those areas that had high demand contributions are located. We can get an idea of which areas are active at a given time. We see possible areas of interest that would show high demand relative to the areas surrounding it.
 
@@ -193,6 +215,8 @@ There are a lot of features that could be added to the ones provided. Some were 
 
 On the prediction model itself, I think a lot of improvements can be made. The use of a CNN to get the effect of neighboring geohashes to the demand could be explored. Longer lookback window can also be considered for future implementation. The current lookback window for the models was set to 25 periods (~6.25 hours). The challenge can accept up to 14-days worth of data (1344 points). Relative to the maximum allowable I am only using 1.86%, it might be worth looking at higher windows to see if any improvement can be extracted. The autoencoder can also use some work. The autoencoder implemented on this project is simply relative to what could be possible for the context. A 2D CNN autoencoder that will look at the spatial data (long and lat) arranged demand could be explored. The autoencoder results could also be rescaled to help the downstream models in achieving a better result. We can take a look at adding other models like varying lookback periods and varying hyperparameter setups prior to ensembling to see if that achieves a better score. There are a lot of possible avenues to explore on this model but for this challenge, I'm quite happy with the MVP I had created.
 
+If you have any other suggestions or recommendations feel free to [message me](https://iocfinc.github.io/). In the meantime this version is submitted to GRAB for evaluation.
+
 ## References
 
 [Hyperparameter Tuning the Random Forest in Python](https://towardsdatascience.com/hyperparameter-tuning-the-random-forest-in-python-using-scikit-learn-28d2aa77dd74)
@@ -204,3 +228,5 @@ On the prediction model itself, I think a lot of improvements can be made. The u
 [Why Forecasts Fail. What to Do Instead](https://sloanreview.mit.edu/article/why-forecasts-fail-what-to-do-instead/)
 
 [SARIMAX on mean visits](https://www.kaggle.com/aless80/sarimax-on-mean-visits)
+
+[How to Grid Search SARIMA Hyperparameters for Time Series Forecasting](https://machinelearningmastery.com/how-to-grid-search-sarima-model-hyperparameters-for-time-series-forecasting-in-python/)
