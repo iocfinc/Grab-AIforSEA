@@ -11,6 +11,7 @@ Feel free to [contact me](https://iocfinc.github.io/)
 
 * [Summary](#-summary)<br>
 * [Problem Statement](#-problem-statement)<br>
+* [Evaluation Guide](#-evaluation-guide)<br>
 * [General Instructions](#-general-instructions)<br>
 * [Approach](#-approach)<br>
 * [Assumptions](#-assumptions)<br>
@@ -46,6 +47,10 @@ Feel free to [contact me](https://iocfinc.github.io/)
 Economies in Southeast Asia are turning to AI to solve traffic congestion, which hinders mobility and economic growth. The first step in the push towards alleviating traffic congestion is to understand travel demand and travel patterns within the city.
 
 > Can we accurately forecast travel demand based on historical Grab bookings to predict areas and times with high travel demand?
+
+## Evaluation Guide
+
+The [EvaluationNotebook.ipynb](https://github.com/iocfinc/Grab-AIforSEA/blob/master/EvaluationNotebook.ipynb) has been provided to centralize the evaluation process. The notebook contains the preprocessing functions, the model load and other helper functions that will be neede to process the data and prepare the model prior to predictions. The sections that are required were marked with **(RUN)** to make it easier to track. A [`requirements.txt`](https://github.com/iocfinc/Grab-AIforSEA/blob/master/requirements.txt) has also been provided to get a list of libraries that were installed during the testing and development of the project. It was run in Google Colab but you should be able to set it up with the requirements.txt file. Also, some of the assumptions and pointers on how to go over the notebook has been provided on the notebook itself. If you need to reach out to me for any issues or questions kindly reach out to me, my contact details can be found [here](https://iocfinc.github.io/).
 
 ## General Instructions
 
@@ -90,8 +95,9 @@ For the ensemble model predictions, I do not have the plot of the fit of the act
 Below are the importance of the individual features as inputs to the Random Forest Regressor. LSTM privded majority of the weights towards the final predictions. We see that we can still improve the Features provided to the Regressor. Maybe we take a look at other possible sources of features. These regressors are simply derived from the LSTM and SARIMA model. It is noticable how small SARIMA contributes to the final predictions.
 
 <p align='center'>
+
 | Feature | Weight |
-| :---: | ---|
+| --- | --- |
 | SARIMA | 0.05922411386898257 |
 | LSTM | 0.29922722858556994 |
 | SARIMA_UP | 0.05565608540644605 |
@@ -99,6 +105,7 @@ Below are the importance of the individual features as inputs to the Random Fore
 | LSTM_UP | 0.2773486113129659 |
 | LSTM_LOW | 0.23378996199788474 |
 | POS | 0.0023823022073583993 |
+
 </p>
 
 ## Spatial Analysis 🗺
