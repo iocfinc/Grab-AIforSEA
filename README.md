@@ -34,7 +34,7 @@ Feel free to [contact me](https://iocfinc.github.io/)
 </h5>
 
 ---
-
+<a name="#-summary"></a>
 ## Summary:
 
 > Grab has [challenged](https://www.aiforsea.com/) participants to come up with solutions on how AI and their data can be used to solve problems in SEA. For my challenge, I chose to take on [Traffic Mangement](https://www.aiforsea.com/traffic-management). There is a portion on [exploring the data](##-spatial-analysis) provided by Grab to understand demands and traffic patterns in the city. Using an [forecasting model](##-approach) I was able to come up with predictions on the demand on the area at a given time. Together with the insights, I got from data exploration, our forecast could become part of [actionable plans](##-possible-suggestions-to-traffic-management) which we can explore. The possibilities for [improvement](##-improvements) on the model and the data is also provided.
@@ -44,38 +44,46 @@ Feel free to [contact me](https://iocfinc.github.io/)
 - [x] 🎯 Fill up the Evaluation Notebook for Instructions on how to use the data.
 - [ ] 🎯 Check the plot of seasonal decomposition and decompose it into individual components to be added to the EDA.
 - [ ] 🎯 Add Additional features on the Regressor. Rolling window means, std, difference. -->
-
+<a name=""></a>
 ## Problem Statement
 
 Economies in Southeast Asia are turning to AI to solve traffic congestion, which hinders mobility and economic growth. The first step in the push towards alleviating traffic congestion is to understand travel demand and travel patterns within the city.
 
 > Can we accurately forecast travel demand based on historical Grab bookings to predict areas and times with high travel demand?
 
+<a name=""></a>
+
 ## General Instructions
 
 The EvaluationNotebook is provided for the evaluation of the final model. The EvaluationNotebook.ipynb has been created to allow the evaluator to get the prediction results given the training and/or holdoff data. Instructions on how to load the models and get predictions would be provided in the notebook. Additional notebooks were also provided to show the solutions and thought process on how the models were created. The Forecasting-Notes.ipynb is the _workbook_ where the majority of the model training and exploration were done. It shows the results of the training and testing of the models that were chosen for the final model. The EDA-NOTES.ipynb is also provided for review to provide the data exploration I did for the project.
+<a name=""></a>
 
 ## Approach
 
 For this problem I went with an Auto-encoder - LSTM - SARIMA - Random Forest Ensemble for the forecasting. The Autoencoder is to allow me to frame this problem as a univariate-multistep forecasting problem. This allowed me to use LSTM and SARIMA as my time-series forecasting models. The LSTM is a static model which was trained under a supervised learning approach. The SARIMA acts as a dynamic model where there is no prior training but with grid-search utilized to come up with a good hyperparameter setting. The LSTM + SARIMA forecasts were then combined together via Random Forest Regression. The idea behind it was to minimize the deviation of the forecasts especially when its farther from the current time. The output of the Random Forest model would then be converted back to the individual date/geohash6 element to allow RMSE calculation and evaluation as part of the project evaluation.
 
 I also added a small data exploration and analysis portion to check if there are insights that can be gained from the current data. I was able to get trends and seasonalities information for the provided data which could be quite useful in providing a solution to the problem in the challenge which is traffic management. There is also a provided heatmap to visualize the demand on a spatiotemporal level.
+<a name=""></a>
 
 ## Assumptions
 
 There were some assumptions made prior to creating the model. First was that I am assuming that the data between day 61 and the time t is going to be provided. The models _can_ walk towards the current time t from day 61 but without the true values, the model would understandably get further from the actual values. Another assumption I made is that even if the data between day 61 and time t is not provided, the last 14-day equivalent data would be provided. This would make the model a one-shot model instead of a walk-forward model, where the evaluator will have to position the model to time t and ask it to forecast times (t+1) ... (t+5) as indicated on the problem.
+<a name=""></a>
 
 ## Results
 
 Below are some of the results I got from the model training. The individual model predictions are shown below. Do not that this looks fairly close to the actual and the reason for that is because I am updating at every time step. The results would be somewhat less fit to the encoded demand if it was updated every 5 steps. The walk forward was also done with constant updates to the true value. Using the predictions of the model to predict the next sequences would act as a negative feedback cycle. The errors in the forecast of the models simply get magnified the further we go with the observations.
+<a name=""></a>
 
 ## LSTM Model
 
 <p align='center'><img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/AIFORSEA-LSTM_WITH_TRAIN_PLOT.png" alt="AIFORSEA-LSTM_WITH_TRAIN_PLOT"></p>
+<a name=""></a>
 
 ## SARIMA Model
 
 <p align='center'><img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/SARIMA-MODEL-5800 Predictions.png" alt="SARIMA-MODEL-5800 Predictions Plot"></p>
+<a name=""></a>
 
 ## Ensemble Random Forest Regression
 
@@ -83,11 +91,15 @@ Below are some of the results I got from the model training. The individual mode
 
 For the ensemble model predictions, I do not have the plot of the fit of the actual and predicted values. Instead, I have a plot of the decoded RMS values every prediction step of the ensemble model. It shows that there is still room for improvement for the model. We notice that the errors tend to be magnified more during times where there is activity and die down when there is low demand overall. I am thinking this could be thought of as the effects of residuals. In any, case there is still room for improvement for future implementations.
 
+<a name=""></a>
+
 ## Spatial Analysis 🗺
 
 <p align='center'><img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/AIFORSEA-HEATMAP-HIGHDEMAND.png" alt="Major Areas - Bloom Plot"></p>
 
 The original dataset one feature that is Spatial, it is the geohash6 encoded tag. There was already a hint provided in the description of how we can make sense of the tag. Resolving the geohash6 locations to individual latitude and longitude combination was done via dictionary lookup to speed up the process. The lookup table was done by making use of the python-geohash library and all the unique geohash tags were resolved to their individual latitude and longitude components. In terms of spatial features, this is the only one I made. After Lat and Long were added I was able to make use of hexbins to serve as my heatmap. In terms of studying the demand and its relationship with the 2D space, we see several notable insights about **where** our demands come from. The locations that we get resolves to a spot somewhere in the middle of the sea so we cannot overlay it to a specific location. What we can do is derive some hypothesis on how our services are needed in the area. Throughout this exploration, I made several hypotheses which may or may not be useful in finding a solution to the original statement of the problem. Here are some insights that we could use based on the data we have.
+
+<a name=""></a>
 
 ### High Demand Areas
 
@@ -97,21 +109,29 @@ We have two major locations with a high concentration of demands. These two area
 
 Aside from the two major areas, we see two areas that also had high demand but more spread out through a wider geographic area **Yellow circles**. These areas continually show demand, not as high as the two major areas but due to the consistency of the spread of demand we can say that it is still a high demand area. In the context of the earlier areas of high concentration as CBDs where there are high-rises and major businesses and places of interests, these two areas tend to be more spread out so I am thinking something of a suburban setting where the development is more horizontal instead of vertical. So think of houses instead of condos for these areas. The demand in these areas is relatively high but due to it being spread around a larger area it should fare better in terms of congestion.
 
+<a name=""></a>
+
 ### Unserved Areas
 
 <p align='center'><img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/AIFORSEA-HEATMAP-UNDERSERVED.png" alt="Major Areas Plot"></p>
 
 I have created a snapshot of a heatmap with locations without demand registered colored blue (which makes sense considering this area is in the middle of the ocean, it really is AI for sea😏 jk). In any case, there are certain areas where there is continually no demand. From this, we can get a "lay of the land" even without the use of a reference/overlay. In a way, it does make sense that there are areas without demand or service. Areas where it would be physically impossible to have a demand, for example, the middle of the sea or inside a big park, or possibly there is a river in our map (which would explain the split of concentration of areas of demand). No city is exactly square, or rectangular for this matter, so it should be fine to have a few gaps. Without an actual reference/overlay we can only assume what is causing the absence of demand. But in terms of planning trips and resource positioning, knowing areas where there is no demand is useful to avoid unnecessarily sending resources to known areas of no demand. Directing our drivers towards areas where our services are needed should also be an important insight for us. I do not think Grab Drivers are paid when they are moving around without a passenger or a booking (I might be wrong about it though). Knowing the areas of low demand is also important for us so that our driver partners can also make a living.
 
+<a name=""></a>
+
 ## Temporal Analysis 📅
 
 We can now take a look at the temporal components of our data. The original dataset provided had two features that relate to time. One was the `Day` feature which is simply a day indicator for the individual rows. The other one is the `timestamp` which is a string which indicates the time the data was polled. What we are after here is the structure of the demand with respect to time. We can know which hours our demand peaks and when it would drop, which day of the week would have high demand, how does our trend look. All these items could be retrieved through the temporal analysis of data. Below are some of the plots and findings I was able to get from studying the data.
+
+<a name=""></a>
 
 ### Encoded Data
 
 <p align='center'><img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/AIFORSEA-ENCODED_DEMAND_PLOT.png" alt="AIFORSEA-ENCODED_DEMAND_PLOT"></p>
 
 The plot above is the encoded data obtained from using the encoder portion of the autoencoder. It looks like a fairly good representation of combined data from the individual geohash6 location. The only issue I had with this current data is that its values are quite large (max value ~7+). It does hurt the LSTM and SARIMAX model scores but other autoencoder structures I have tried have either an inverted plot or a much larger range so I am for the moment stuck with this autoencoder. What I do like about the autoencoder is that it allows me to frame the problem of multivariate (multiple geohash6 codes) into a simpler univariate problem. It also has an added benefit of being a fairly reasonable representation of the actual demand of the combined geohash6 locations since its a higher level representation (it is assumed that all the relevant features have been encapsulated inside the single encoded value). To start with the temporal analysis of the dataset we go with a seasonal decomposition graph.
+
+<a name=""></a>
 
 ### Seasonal Decomposition
 
@@ -143,6 +163,8 @@ If we want to consider a higher time frame then we can simply change the frequen
 
 FB Prophet's seasonality plot was also retrieved and is shown above. Although I did not pursue using FB Prophet as a model to the ensemble, I was able to explore it and get some sample predictions on it as well as the plot above. It just confirms what we can observe in the seasonal decomposition plots we had earlier. This plot was taken when I tried to forecast the demand for a single geoencoded location. It had a training set of all the data before day 45 (04-15-2019 00:00:00) and it is predicting all the data beyond that point so until day 61. We see that there is a positively sloped trend so we expect the data to continually grow. We see the structure of the weekly seasonality where the demand starts to dip at one point before picking up again. Notable here is the fact that the dip happens on Wednesday. I am not sure if there is data to support that, my earlier hypothesis was the dips were happening on the weekends. Both my hypothesis and Prophet's layout of the actual day of the week where the dip happens cannot be confirmed since we are using an arbitrary date as a stand-in. The important thing to consider here would be the structure of the seasonalities and trend. Finally, we have the daily timeframe which shows the hourly structure of demand. We confirm that there is a decrease in demand around late afternoon and in the evening. As we go later into the night hours our demand starts to pick up again and will continuously grow until we reach the peak which is around 10:00 AM to Noon. For the hourly structure of data, we can be confident that this structure holds. We do not have to hypothesize the actual time since it has been provided directly in the dataset without any obfuscation. Again, the important thing to consider here is the structure of the demand on the hourly level. Later on, in the animated heatmap, we can somehow confirm that the demand does follow the hourly structure of dipping on the late afternoons and evenings and peaking around the morning until noon.
 
+<a name=""></a>
+
 ## Spatiotemporal
 
 
@@ -150,6 +172,8 @@ FB Prophet's seasonality plot was also retrieved and is shown above. Although I 
 <img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/heatmap-animation_fixed.gif" alt="heatmap-animation_fixed">
 
 Now we combine both the **when** and the **where** data. In **Temporal** we get an idea of how demand moves with time. With **Spatial** we see how demand is distributed in space. Moving further, with the help of heatmaps and animation, we can get an idea of how demand is distributed in time and in space.
+
+<a name=""></a>
 
 ## Animated Heatmap
 
@@ -175,6 +199,8 @@ How does this help in the context of traffic management? Knowing these cycles wo
 
 The one thing we must take care of when dealing with is the residuals data. If you are familiar with the "coconut" reference then these are our coconuts. Yes, it is helpful to study these residuals to see if we can correlate spikes to certain information, for example, a spike which was caused by a transport strike. Or a sudden surge due to an event. We can use the residuals as a reference so that we can set up other sources of information. For example, if we see a sudden surge and notice that there was a trending item on social media about a concert then we can in the future check for these sorts of anomalies so they can at least be flagged and we can adapt. The coconuts are coconuts for a reason. They are rare events which have a considerable impact on our demand. Although I don't think modeling residuals would be worth it, they are really noisy, using them in the context of early warning can be useful. With the case of missing data, it is not related to traffic, but we can possibly create a monitoring system for our infrastructure as well. It may not be traffic related but it will certainly help when we know if there is a failure in our internal infrastructure which could lead to downtimes.
 
+<a name=""></a>
+
 ## Possible Suggestions to Traffic Management
 
 Based on what we have explored so far I came up with suggestions on how we can address the traffic congestion problem.
@@ -191,11 +217,15 @@ We could possibly take a look at having better partnerships with public transpor
 
 Knowing where our demand is and when it would likely increase allows us to look at the possibility of staging our resources. Instead of our drivers loitering around waiting for a booking, it would be possible for us to direct them to a staging area. Grab could partner with parking garages, gasoline stations, neighborhood associations to have designated staging areas on their vicinity. In the staging area, our drivers can rest up and wait for a booking. From the analysis of the spatiotemporal data, we can locate suitable locations where our drivers could stay in anticipation of increased demand. We can pool our resources to staging areas so that they are off the roads so they minimize their effect to congestion.
 
+<a name=""></a>
+
 ## Improvements
 
 There are a lot of features that could be added to the ones provided. Some were not implemented due to the obfuscation of the details on the dataset (location and dates). For example, landmarks overlayed to the spatial map would be useful in understanding the nature of the demand in certain areas. The use of holidays as a regressor could also be added after the actual dates have been provided. The timestamp and date values on the dataset were not provided so I did not think it was wise to add special holidays as a regressor since we cannot localize the data and the timings.
 
 On the prediction model itself, I think a lot of improvements can be made. The use of a CNN to get the effect of neighboring geohashes to the demand could be explored. Longer lookback window can also be considered for future implementation. The current lookback window for the models was set to 25 periods (~6.25 hours). The challenge can accept up to 14-days worth of data (1344 points). Relative to the maximum allowable I am only using 1.86%, it might be worth looking at higher windows to see if any improvement can be extracted. The autoencoder can also use some work. The autoencoder implemented on this project is simply relative to what could be possible for the context. A 2D CNN autoencoder that will look at the spatial data (long and lat) arranged demand could be explored. The autoencoder results could also be rescaled to help the downstream models in achieving a better result. We can take a look at adding other models like varying lookback periods and varying hyperparameter setups prior to ensembling to see if that achieves a better score. There are a lot of possible avenues to explore on this model but for this challenge, I'm quite happy with the MVP I had created.
+
+<a name="#-references"></a>
 
 ## References
 
