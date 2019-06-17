@@ -101,7 +101,7 @@ Below are the importance of the individual features as inputs to the Random Fore
 | LSTM | 0.29922722858556994 | The LSTM predictions for the time step |
 | SARIMA_UP | 0.05565608540644605 | SARIMA * 1.05 |
 | SARIMA_LOW | 0.0723716966207925 | SARIMA * 0.95 |
-| LSTM_UP | 0.2773486113129659 | LSTM * 1.05|
+| LSTM_UP | 0.2773486113129659 | LSTM * 1.05 |
 | LSTM_LOW | 0.23378996199788474 | LSTM * 0.95 |
 | POS | 0.0023823022073583993 | Location of the forecast (1 - 5). Scaled to fit between (0,1) |
 </p>
