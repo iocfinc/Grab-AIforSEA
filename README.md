@@ -68,7 +68,7 @@ There were some assumptions made prior to creating the model. First was that I a
 
 ## Results
 
-Below are some of the results I got from the model training. The individual model predictions are shown below. Do not that this looks fairly close to the actual and the reason for that is because I am updating at every time step. The results would be somewhat less fit to the encoded demand if it was updated every 5 steps. The walk forward was also done with constant updates to the true value. Using the predictions of the model to predict the next sequences would act as a negative feedback cycle. The errors in the forecast of the models simply get magnified the further we go with the observations.
+Below are some of the results I got from the model training. The individual model predictions are shown below. Do note that these plots looks fairly close to the actual and the reason for that is because I am updating at every time step. The results would be somewhat less fit to the encoded demand if it was updated every 5 steps. The walk forward was also done with constant updates to the true value. Using the predictions of the model to predict the next sequences would act as a negative feedback cycle. The errors in the forecast of the models simply get magnified the further we go with the observations.
 
 ## LSTM Model
 
@@ -90,29 +90,27 @@ The output of the SARIMA model is seen above. Again, it does seem to model the e
 
 <p align='center'><img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/AIFORSEA-DECODED_SCORE_PLOT_LONG.png" alt="AIFORSEA-DECODED_SCORE_PLOT_LONG"></p>
 
-For the ensemble model predictions, I do not have the plot of the fit of the actual and predicted values. Instead, I have a plot of the decoded RMS values every prediction step of the ensemble model. It shows that there is still room for improvement for the model. We notice that the errors tend to be magnified more during times where there is activity and die down when there is low demand overall. I am thinking this could be thought of as the effects of residuals. In any, case there is still room for improvement for future implementations.
+For the ensemble model predictions, I do not have the plot of the fit of the actual and predicted values. Instead, I have a plot of the decoded RMS values every prediction step of the ensemble model. It shows that there is still room for improvement for the model. We notice that the errors tend to be magnified more during times where there is activity and die down when there is low demand overall. I am thinking this could be thought of as the effects of residuals. There is still room for improvement for future implementations.
 
-Below are the importance of the individual features as inputs to the Random Forest Regressor. LSTM privded majority of the weights towards the final predictions. We see that we can still improve the Features provided to the Regressor. Maybe we take a look at other possible sources of features. These regressors are simply derived from the LSTM and SARIMA model. It is noticable how small SARIMA contributes to the final predictions.
+Below are the importance of the individual features as inputs to the Random Forest Regressor. LSTM provided majority of the weights towards the final predictions. We see that we can still improve the Features provided to the Regressor. Maybe we take a look at other possible sources of features. These regressors are simply derived from the LSTM and SARIMA model. It is noticable how small SARIMA contributes to the final predictions and how little weight is given to the POS feature.
 
 <p align='center'>
-
-| Feature | Weight |
-| --- | --- |
-| SARIMA | 0.05922411386898257 |
-| LSTM | 0.29922722858556994 |
-| SARIMA_UP | 0.05565608540644605 |
-| SARIMA_LOW | 0.0723716966207925 |
-| LSTM_UP | 0.2773486113129659 |
-| LSTM_LOW | 0.23378996199788474 |
-| POS | 0.0023823022073583993 |
-
+| Feature | Weight | Description |
+| --- | --- | --- |
+| SARIMA | 0.05922411386898257 | The SARIMA predictions for the time step |
+| LSTM | 0.29922722858556994 | The LSTM predictions for the time step |
+| SARIMA_UP | 0.05565608540644605 | SARIMA * 1.05 |
+| SARIMA_LOW | 0.0723716966207925 | SARIMA * 0.95 |
+| LSTM_UP | 0.2773486113129659 | LSTM * 1.05|
+| LSTM_LOW | 0.23378996199788474 | LSTM * 0.95 |
+| POS | 0.0023823022073583993 | Location of the forecast (1 - 5). Scaled to fit between (0,1) |
 </p>
 
 ## Spatial Analysis 🗺
 
 <p align='center'><img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/AIFORSEA-HEATMAP-HIGHDEMAND.png" alt="Major Areas - Bloom Plot"></p>
 
-The original dataset one feature that is Spatial, it is the geohash6 encoded tag. There was already a hint provided in the description of how we can make sense of the tag. Resolving the geohash6 locations to individual latitude and longitude combination was done via dictionary lookup to speed up the process. The lookup table was done by making use of the python-geohash library and all the unique geohash tags were resolved to their individual latitude and longitude components. In terms of spatial features, this is the only one I made. After Lat and Long were added I was able to make use of hexbins to serve as my heatmap. In terms of studying the demand and its relationship with the 2D space, we see several notable insights about **where** our demands come from. The locations that we get resolves to a spot somewhere in the middle of the sea so we cannot overlay it to a specific location. What we can do is derive some hypothesis on how our services are needed in the area. Throughout this exploration, I made several hypotheses which may or may not be useful in finding a solution to the original statement of the problem. Here are some insights that we could use based on the data we have.
+The original dataset has one feature that is Spatial in nature, it is the geohash6 encoded tag. There was already a hint provided in the description of how we can make sense of the tag. Resolving the geohash6 locations to individual latitude and longitude combination was done via dictionary lookup to speed up the process. The lookup table was done by making use of the python-geohash library and all the unique geohash tags were resolved to their individual latitude and longitude components. In terms of spatial features, this is the only one I made. It did note on the EDA notebook of a possible improvement of this where in we get the spatial relationships of locations close together and how that affects their respective demands. After Lat and Long were added I was able to make use of hexbins to serve as my heatmap. In terms of studying the demand and its relationship with the 2D space, we see several notable insights about **where** our demands come from. The locations that we get resolves to an area somewhere in the middle of the sea so we cannot overlay it to a specific location. What we can do is derive some hypothesis on how our services are needed in the area. Throughout this exploration, I made several hypotheses which may or may not be useful in finding a solution to the original statement of the problem. Here are some insights that we could use based on the data we have.
 
 ### High Demand Areas
 
@@ -144,13 +142,11 @@ The plot above is the encoded data obtained from using the encoder portion of th
 
 In terms of the time component, I did some seasonal decomposition of the encoded data. It is one added benefit of converting the demand data into an encoded high-level representation. This way, I was, for the most part, able to analyze a representation of the demand we have in a single value. Having this information allows us to see and get an idea of how our demand is with respect to time. We can see the demand in terms of daily, weekly, hourly and even monthly timeframe.
 
-First of is the trend and seasonalities as well as the residuals plot. The graph above shows our data on a "daily" frequency (freq=96 = 24 x 4). I think it is daily if I understood the frequency setting correctly 😂 The **observed** data shows the daily values of the demand. It is basically the combination of the three lower plots. The observed values are the sum of the components on that specific time. The components of a specific observation in time is simply the base represented by the trend, the seasonality which represents the hours in this case and the residuals which represent the 15-minute buckets for this example. All the values of the three, trend + seasonality + residual, **AT A GIVEN SPECIFIC TIME** when added would correspond to the observed value for that time.
-
-🛰 If your familiar with AM in communications I think that applies to this data. If your an Electronics engineer you might notice that it looks like an AM waveform.
+First of is the trend and seasonalities as well as the residuals plot. The graph above shows our data on a "daily" frequency (freq=96 = 24 x 4). I think it is daily if I understood the frequency setting correctly 😂. The **observed** data shows the daily values of the demand. It is basically the combination of the three lower plots. The observed values are the sum of the components on that specific time. The components of a specific observation in time is simply the base represented by the trend, the seasonality which represents the hours in this case and the residuals which represent the 15-minute buckets for this example. All the values of the three, trend + seasonality + residual, **AT A GIVEN SPECIFIC TIME** when added would correspond to the observed value for that time.
 
 <p align='center'><img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/AIFORSEA-TREND-96.png" alt="AIFORSEA-TREND-96"></p>
 
-The **trend** graph is going to be the weekly timeframe component. We can see based on the trend of how the demand flows through the week. We see the demand's crest and through at a fairly regular interval. We see from the trend which days have high _base_ demand. I think it is fair to assume that the low points of the trend are weekends where generally demand would be lower. Prior to the days of low demand are days with increasing demand, if the low points are the weekends then we can say that demand picks up on Mondays and grows until it reaches Friday where base demand is consistently highest throughout the data frame. We can also see dips in some trend days where the pattern is broken. This might correspond to holidays where the effects are on a large scale that it reflects in the trend plot. Although we can only assume without the reference data of where day 1 is, seeing these things in the data is fun enough.
+The **trend** graph is going to be the weekly timeframe component. We can see based on the trend of how the demand flows through the week. We see the demand's crest and trough at a fairly regular interval. We see from the trend which days have high _base_ demand. I think it is fair to assume that the low points of the trend are weekends where generally demand would be lower. Prior to the days of low demand are days with increasing demand, if the low points are the weekends then we can say that demand picks up on Mondays and grows until it reaches Friday where base demand is consistently highest throughout the data frame. We can also see dips in some trend days where the pattern is broken. This might correspond to holidays where the effects are on a large scale that it reflects in the trend plot. Although we can only assume without the reference data of where day 1 is, seeing these things in the data is fun enough.
 
 <p align='center'><img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/AIFORSEA-SEASONAL-96.png" alt="AIFORSEA-SEASONAL-96"></p>
 
@@ -190,7 +186,9 @@ Making these animated heatmaps should reinforce what we have been noticing in th
 
 One example insight we can get is in checking which area/s would have to be served during late hours. We have stated in the temporal analysis section that our demand tends to die down during the late afternoons and start to pick up late in the evening. Knowing where these areas of demand are after a period of low demand will allow us to focus our drivers towards that area on a timely manner, this way they don't stay too long in the area so they reduce their contribution to congestion. Another insight we can also get is where are the active areas when its early morning. We know that our demand will steadily grow from late in the night (11PM+) towards the next day. One possible explanation for this would be the absence of other forms of transport. When we know which areas are active during the _off hours_ we can advise drivers to go towards known areas of demand so that they get rides faster.
 
-I mentioned that there are areas that are out of phase in terms of the demand of the region as a whole. One example would be this location. It tends to have demand late in the nights and early morning but less during lunch time. It is out of sync from the majority of the locations. I'm guessing this is a major location, possibly an airport based on the times of its demand and its approximate distance from the city center where high demand is concentrated.
+<p align='center'><img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/AIFORSEA-HEATMAP-HIGHINTEREST.png" alt="AIFORSEA-HEATMAP-HIGHINTEREST"></p>
+
+I mentioned that there are areas that are out of phase in terms of the demand of the region as a whole. One example would be the location indicated above. It tends to have demand late in the nights and early morning but less during lunch time. It is out of sync from the majority of the locations. I'm guessing this is a major location, possibly an airport based on the times of its demand and its approximate distance from the city center where high demand is concentrated.
 
 Having a spatiotemporal representation allows us to have a model of how our demand behaves at different areas at specific times. Know this allows us to adjust our plans accordingly and have initiatives that could help in decongesting the "city".
 
