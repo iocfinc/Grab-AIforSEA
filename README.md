@@ -95,6 +95,7 @@ For the ensemble model predictions, I do not have the plot of the fit of the act
 Below are the importance of the individual features as inputs to the Random Forest Regressor. LSTM provided majority of the weights towards the final predictions. We see that we can still improve the Features provided to the Regressor. Maybe we take a look at other possible sources of features. These regressors are simply derived from the LSTM and SARIMA model. It is noticable how small SARIMA contributes to the final predictions and how little weight is given to the POS feature.
 
 <p align='center'>
+
 | Feature | Weight | Description |
 | --- | --- | --- |
 | SARIMA | 0.05922411386898257 | The SARIMA predictions for the time step |
@@ -104,6 +105,7 @@ Below are the importance of the individual features as inputs to the Random Fore
 | LSTM_UP | 0.2773486113129659 | LSTM * 1.05 |
 | LSTM_LOW | 0.23378996199788474 | LSTM * 0.95 |
 | POS | 0.0023823022073583993 | Location of the forecast (1 - 5). Scaled to fit between (0,1) |
+
 </p>
 
 ## Spatial Analysis 🗺
