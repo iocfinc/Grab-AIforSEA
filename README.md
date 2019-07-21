@@ -46,7 +46,7 @@ Feel free to [contact me](https://iocfinc.github.io/)
 
 # 🏆 Congratulations to everyone!!! 🏆
 
-<p align='center'><img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/GRAB-TOP50" alt="AIFORSEA-TOP50-Candidates"><br>Top 50 candidates together with judges and Grab's co-founder</p>
+<p align='center'><img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/GRAB-TOP50,jpg" alt="AIFORSEA-TOP50-Candidates"><br>Top 50 candidates together with judges and Grab's co-founder</p>
 
 ## Problem Statement
 
