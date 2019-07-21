@@ -30,6 +30,8 @@ Feel free to [contact me](https://iocfinc.github.io/)
 * [Suggestions and Findings](#-possible-suggestions-to-traffic-management)<br>
 * [Improvements](#-improvements)<br>
 * [References](#-references)<br>
+* [Personal Notes](#-update)<br>
+
 ---
 
 ## Summary:
@@ -41,6 +43,10 @@ Feel free to [contact me](https://iocfinc.github.io/)
 - [x] 🎯 Fill up the Evaluation Notebook for Instructions on how to use the data.
 - [ ] 🎯 Check the plot of seasonal decomposition and decompose it into individual components to be added to the EDA.
 - [ ] 🎯 Add Additional features on the Regressor. Rolling window means, std, difference. -->
+
+# 🏆 Congratulations to everyone!!! 🏆
+
+<p align='center'><img src="https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/GRAB-TOP50" alt="AIFORSEA-TOP50-Candidates"><br>Top 50 candidates together with judges and Grab's co-founder</p>
 
 ## Problem Statement
 
@@ -55,6 +61,9 @@ The [EvaluationNotebook.ipynb](https://github.com/iocfinc/Grab-AIforSEA/blob/mas
 ## General Instructions
 
 The EvaluationNotebook is provided for the evaluation of the final model. The EvaluationNotebook.ipynb has been created to allow the evaluator to get the prediction results given the training and/or holdoff data. Instructions on how to load the models and get predictions would be provided in the notebook. Additional notebooks were also provided to show the solutions and thought process on how the models were created. The Forecasting-Notes.ipynb is the _workbook_ where the majority of the model training and exploration were done. It shows the results of the training and testing of the models that were chosen for the final model. The EDA-NOTES.ipynb is also provided for review to provide the data exploration I did for the project.
+
+**Update: Pitch deck is also uploaded for anyone who might want to check it.<br>
+Feel free to contact/connect with me: https://www.linkedin.com/in/iraoliverfernandoph/. Would love to hear your inputs and learn from you as well.**
 
 ## Approach
 
@@ -222,7 +231,20 @@ There are a lot of features that could be added to the ones provided. Some were 
 
 On the prediction model itself, I think a lot of improvements can be made. The use of a CNN to get the effect of neighboring geohashes to the demand could be explored. Longer lookback window can also be considered for future implementation. The current lookback window for the models was set to 25 periods (~6.25 hours). The challenge can accept up to 14-days worth of data (1344 points). Relative to the maximum allowable I am only using 1.86%, it might be worth looking at higher windows to see if any improvement can be extracted. The autoencoder can also use some work. The autoencoder implemented on this project is simply relative to what could be possible for the context. A 2D CNN autoencoder that will look at the spatial data (long and lat) arranged demand could be explored. The autoencoder results could also be rescaled to help the downstream models in achieving a better result. We can take a look at adding other models like varying lookback periods and varying hyperparameter setups prior to ensembling to see if that achieves a better score. There are a lot of possible avenues to explore on this model but for this challenge, I'm quite happy with the MVP I had created.
 
-If you have any other suggestions or recommendations feel free to [message me](https://iocfinc.github.io/). In the meantime this version is submitted to GRAB for evaluation.
+If you have any other suggestions or recommendations feel free to [message me](https://iocfinc.github.io/). In the meantime, this version is submitted to GRAB for evaluation.
+
+### POST-PITCH Improvements:
+
+As mentioned, the model has not considered the spatial relationship (e.g. adjacency) between locations. It would *(at least from what I understand)* make sense to ensure that the adjacency between locations is represented as well during the encoding. There might be rare cases where a location is out of phase with the surrounding areas, see <a href='https://github.com/iocfinc/Grab-AIforSEA/blob/master/images/AIFORSEA-HEATMAP-HIGHINTEREST.png' alt='High Interest image'></a>. In general, though, it might make sense to assume that demands in certain locations are closely related and will not suddenly drop so it makes sense to allow the model to give focus to the areas of demand. A CNN might do the trick here, the psuedocode is already in one of the notebooks if I remember correctly. I have not found the time to implement the forecasting that way due to time constraints.
+
+>>> **NOTE:**
+The reasoning behind why I used autoencoders in the first place was due to the problem I was having with resources during computation and the lack of data on some locations. My thinking was that it could be possible to do individualized model per location but I was having problems figuring out how that would scale. To give you an idea, this entire project was trained using Google Colab which is quite limited in terms of compute cores 😅 (it is free though so no complaints on my end). I did not think that it would be a good idea to train individualized models per location because if I think about it I do not see it scaling well. Another thing that was a bit problematic when doing individualized models per location was that there are locations in the data where there was only one demand recorded. You might think that it could be dropped to reduce the number of models to train. The counter-point to that was that what if it was a new house on the edge of town and during the time the data was captured there was only one recorded booking from that location. It would not make sense to drop these locations. It would also be hard to extrapolate the entire 5856 points from a single value. Using an autoencoder would solve these problems for me. For one, the encoded data would be smaller than running the entire set while still retaining some resemblance of the original data. It also *learns* how to deal with the points in the map where there are missing data.
+ <br><br>Admittedly, the use of an ANN for a *heatmap* is not really that great to begin with🤦🏼‍♂️. I had to resort to a *mask* to ensure that the locations with final predictions are matching the locations where the demand forecast is needed. That is also one downside of not using individualized models, there are some predictions on locations that should not have forecasts to begin with. A quick look at the predictions also showed that some locations had predictions that were way off although using MSE does show that for the most part the errors were small. Still, it could use refinement.<br><br>
+ *These are based on how I understand the situation so there might be a better way to do it so feel free to email me and help me improve (🧙‍♂️ please mentor me I am still a 🥔 !!!)*.
+
+Another possible improvement would be to use a generative model to train the model better. In this project, there were only 5856 data points. This is a *relatively* small size considering that we are using LSTM/Deep learning. To counter this, I am thinking that it might make sense to use a generative model to have more data and improve the general model.
+
+The ensembling model also needs work. In contradiction to what the M3 competition results have proven, the LSTM module in this project had more weight to it in the ensembling than the SARIMA module. This has not yet been exhaustively investigated during the challenge as to why there was a contradiction with the weights. From M4 results, we know that ensembling methods work well although I have not read up on any mention of ML approaches performing better than statistical approaches. My idea is to create individualized ensembling models per time step. Instead of one single model for any time step we create one unique model for (t+1,..., t+5) for sanity checking.
 
 ## References
 
@@ -237,3 +259,17 @@ If you have any other suggestions or recommendations feel free to [message me](h
 [SARIMAX on mean visits](https://www.kaggle.com/aless80/sarimax-on-mean-visits)
 
 [How to Grid Search SARIMA Hyperparameters for Time Series Forecasting](https://machinelearningmastery.com/how-to-grid-search-sarima-model-hyperparameters-for-time-series-forecasting-in-python/)
+
+## Personal Notes on the competition:
+
+The first iteration of the challenge has been completed. A quick rundown of the stats for the challenge showed that there were 25,000 individuals invited to join, 1,200 were able to submit solutions and eventually the top candidates were selected. The Pitch Day was held at Grab's Singapore Headquarters and all the top 50 candidates were flown in. I was fortunate enough to have this submission get selected for the top 10 entries. Personally, it was a great achievement for me considering that it was my first public competition.
+
+During the pitch day, I was able to chat with a few of the participants and the backgrounds were diverse. We had someone working already as a data scientist, some data analysts, I was able to chat with someone who was already doing his doctorate degree, there was a VP for Data, there were some graduating students as well. It is not just the experiences and backgrounds that were diverse, The was a lot of representation from the different nationalities as well, mostly in SEA region. Some were based in Singapore, I had a chat with someone from Thailand, another one from Indonesia, I was seated next to someone from Malaysia, there was another Filipino candidate as well. What I think was great during that day was the amount of talent that they were able to find from the different countries in SEA and worldwide. The commonality is that we are all interested in using AI/ML to help solve some of the pressing problems in SEA. It is always great to get together with others on the same goal, it is like being in the Slack channel in Udacity only in real life. Together with the Top 50 were some of Grab's data scientist, some managers, engineers. We were able to talk to the employees of Grab as well. We talked about their work and what it was like working for Grab and how they ended up working for Grab. The representatives from the sponsors were also there and even the co-founder of Grab was present.
+
+The top 10 participants were given the chance to pitch our submissions and provide the insights and solutions we had come up with for our problem statements. This was personally one of the hardest parts of the challenge. There were some interesting work presented, some were cutting edge actually. We had to distill the work we have done for one month into a four-minute presentation. Creating a coherent pitch from the framing of the problem up until the solutions and eventually the findings and implementations and gutting it out to fit 4 minutes was more challenging than the actual challenge itself. Pitching/public speaking and introvert are two words that rarely mix well 😂.
+
+After the pitch was some presentation from the sponsors. Their presentation was centered on how AI solutions that we were making were creating an impact on society. They also highlighted how they are working together with the industry to enable the integration and adoption of the solutions. The co-founder of Grab, Hooi Ling Tan, was also present and gave a small talk on Grab and its initiative and how the competition was in line with what Grab is trying to achieve for the SEA region. We even had the chance for a quick meet-and-greet/Roundtable with Ms. Tan after the ceremony on some items we had for Grab.
+
+On a personal note, this was a great experience for me. I decided to pivot towards Data Science/AI role in June 2018 as an objective for the year during my birthday. I started doing online courses in Udacity focused on Deep Learning in July 2018. I had the chance to take part in a scholarship grant by Facebook for a nanodegree on Deep Learning using PyTorch. For almost a full year I was learning in my spare time. The original goal was actually to join Kaggle challenges to test out my learnings and get an idea on which parts I have to improve on, sort of a validation set for my journey. Hopefully, I get to work with Grab and have some positive impact towards SEA. 
+
+A huge thank you to Grab for the opportunity. A big thank you to [Mr. Andrey Lukyanenko](https://www.linkedin.com/in/andlukyane/) who was always answering my questions about public competitions and answering all the questions I had during the challenge. To [Padang & Co.](http://padang.co/) (Sir Diva) for running the challenge and the help during the pitch clinic and a huge congratulations to everyone.
