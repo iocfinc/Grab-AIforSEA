@@ -53,7 +53,7 @@ decorator==4.4.0
 defusedxml==0.6.0
 dill==0.2.9
 distributed==1.25.3
-Django==2.2.3
+Django==2.2.10
 dlib==19.16.0
 dm-sonnet==1.33
 docopt==0.6.2
