@@ -316,7 +316,7 @@ tblib==1.4.0
 tensor2tensor==1.11.0
 tensorboard==1.13.1
 tensorboardcolab==0.0.22
-tensorflow==1.13.1
+tensorflow==1.15.4
 tensorflow-estimator==1.13.0
 tensorflow-hub==0.4.0
 tensorflow-metadata==0.13.0
