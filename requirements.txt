@@ -46,7 +46,7 @@ cymem==2.0.2
 Cython==0.29.10
 cytoolz==0.9.0.1
 daft==0.0.4
-dask==1.1.5
+dask==2021.10.0
 dataclasses==0.6
 datascience==0.10.6
 decorator==4.4.0
