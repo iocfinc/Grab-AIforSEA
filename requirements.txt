@@ -52,7 +52,7 @@ datascience==0.10.6
 decorator==4.4.0
 defusedxml==0.6.0
 dill==0.2.9
-distributed==1.25.3
+distributed==2021.10.0
 Django==2.2.3
 dlib==19.16.0
 dm-sonnet==1.33
