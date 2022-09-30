@@ -146,7 +146,7 @@ jedi==0.13.3
 jieba==0.39
 Jinja2==2.10.1
 jmespath==0.9.4
-joblib==0.13.2
+joblib==1.2.0
 jpeg4py==0.1.4
 jsonschema==2.6.0
 jupyter==1.0.0
